@@ -6,8 +6,8 @@ import math
 
 rom = []
 
-for i in range(12):
+for i in range(16):
     value = math.degrees(math.atan(2**-i))
-    rom.append(format(round(value*256), 'x'))
+    rom.append(round(value*256))
 
 print(rom)
