@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Keyaan Khatri
+ * Copyright (c) 2026 Keyaan Khatri
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,23 +21,23 @@ module tt_um_keyaan_tinytrigunit (
   // reg [15:0] y_reg;
 
   // values of arctan of powers of 2 from 0 to -11, preloaded: 
-  reg [15:0] rom [11:0] = {16'd11520, 16'd6801, 16'd3593, 16'd1824, 16'd916, 16'd458, 16'd229, 16'd115, 16'd57, 16'd29, 16'd14, 16'd7};
+  reg [15:0] rom [0:11] = {16'd11520, 16'd6801, 16'd3593, 16'd1824, 16'd916, 16'd458, 16'd229, 16'd115, 16'd57, 16'd29, 16'd14, 16'd7};
 
   reg [15:0] rom_val;
   always @(*) begin
     case (ui_in[3:0])
-      4'd0:  rom_val = 16'd11520;
-      4'd1:  rom_val = 16'd6801;
-      4'd2:  rom_val = 16'd3593;
-      4'd3:  rom_val = 16'd1824;
-      4'd4:  rom_val = 16'd916;
-      4'd5:  rom_val = 16'd458;
-      4'd6:  rom_val = 16'd229;
-      4'd7:  rom_val = 16'd115;
-      4'd8:  rom_val = 16'd57;
-      4'd9:  rom_val = 16'd29;
-      4'd10: rom_val = 16'd14;
-      4'd11: rom_val = 16'd7;
+      4'd0:  rom_val = rom[0];
+      4'd1:  rom_val = rom[1];
+      4'd2:  rom_val = rom[2];
+      4'd3:  rom_val = rom[3];
+      4'd4:  rom_val = rom[4];
+      4'd5:  rom_val = rom[5];
+      4'd6:  rom_val = rom[6];
+      4'd7:  rom_val = rom[7];
+      4'd8:  rom_val = rom[8];
+      4'd9:  rom_val = rom[9];
+      4'd10: rom_val = rom[10];
+      4'd11: rom_val = rom[11];
       default: rom_val = 16'd0;
     endcase
   end
