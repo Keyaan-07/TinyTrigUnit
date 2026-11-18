@@ -16,10 +16,12 @@ module tt_um_keyaan_tinytrigunit (
     input  wire       rst_n     // reset_n - low to reset
 );
   // state = 0 is idle, and state = 1 is compute
-  reg state = 0; 
-  reg [15:0] x_reg;
-  reg [15:0] y_reg;
-
+  // reg state = 0; 
+  // reg [15:0] x_reg;
+  // reg [15:0] y_reg;
+  assign uio_in = 8'b0;
+  assign uio_oe = 8'b0;
+  assign uo_out = 8'b0;
 
   // values of arctan of powers of 2 from 0 to -11, preloaded: 
   reg [15:0] rom [11:0] = {16'd11520, 16'd6801, 16'd3593, 16'd1824, 16'd916, 16'd458, 16'd229, 16'd115, 16'd57, 16'd29, 16'd14, 16'd7};
