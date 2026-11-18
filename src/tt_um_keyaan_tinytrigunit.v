@@ -22,7 +22,7 @@ module tt_um_keyaan_tinytrigunit (
 
 
   // values of arctan of powers of 2 from 0 to -11, preloaded: 
-  reg [11:0] rom [15:0] = {16'd11520, 16'd6801, 16'd3593, 16'd1824, 16'd916, 16'd458, 16'd229, 16'd115, 16'd57, 16'd29, 16'd14, 16'd7};
+  reg [15:0] rom [11:0] = {16'd11520, 16'd6801, 16'd3593, 16'd1824, 16'd916, 16'd458, 16'd229, 16'd115, 16'd57, 16'd29, 16'd14, 16'd7};
   
 
   // List all unused inputs to prevent warnings
