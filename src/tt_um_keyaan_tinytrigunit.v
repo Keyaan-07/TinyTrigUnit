@@ -19,8 +19,8 @@ module tt_um_keyaan_tinytrigunit (
   // reg state = 0; 
   // reg [15:0] x_reg;
   // reg [15:0] y_reg;
-  assign uio_in = 8'b0;
   assign uio_oe = 8'b0;
+  assign uio_out = 8'b0;
   assign uo_out = 8'b0;
 
   // values of arctan of powers of 2 from 0 to -11, preloaded: 
