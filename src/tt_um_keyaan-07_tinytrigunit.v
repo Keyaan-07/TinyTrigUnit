@@ -15,13 +15,14 @@ module tt_um_tinytrigunit (
     input  wire       clk,      // clock
     input  wire       rst_n     // reset_n - low to reset
 );
+  // state = 0 is idle, and state = 1 is compute
+  reg state = 0; 
+  reg [15:0] x_reg;
+  reg [15:0] y_reg;
 
-  // All output pins must be assigned. If not used, assign to 0.
-  assign uo_out  = ui_in + uio_in;  // Example: ou_out is the sum of ui_in and uio_in
-  assign uio_out = 0;
-  assign uio_oe  = 0;
 
-  reg [15:0] rom [15:0];
+  // values of arctan of powers of 2 from 0 to -11, preloaded: 
+  reg [15:0] rom [15:0] = {16'd11520, 16'd6801, 16'd3593, 16'd1824, 16'd916, 16'd458, 16'd229, 16'd115, 16'd57, 16'd29, 16'd14, 16'd7};
   
 
   // List all unused inputs to prevent warnings
