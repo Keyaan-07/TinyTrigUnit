@@ -1,6 +1,6 @@
 `default_nettype none
 
-module cordic (
+module cordic_keyaan (
     input wire signed [15:0]x,
     input wire signed [15:0]y,
     input wire signed [15:0]z,

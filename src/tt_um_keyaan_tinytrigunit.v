@@ -15,45 +15,83 @@ module tt_um_keyaan_tinytrigunit (
     input  wire       clk,      // clock
     input  wire       rst_n     // reset_n - low to reset
 );
-  // values of arctan of powers of 2 from 0 to -11, hardwired:
-  wire [15:0] rom [0:11];
-  assign rom[0]  = 16'd11520;
-  assign rom[1]  = 16'd6801;
-  assign rom[2]  = 16'd3593;
-  assign rom[3]  = 16'd1824;
-  assign rom[4]  = 16'd916;
-  assign rom[5]  = 16'd458;
-  assign rom[6]  = 16'd229;
-  assign rom[7]  = 16'd115;
-  assign rom[8]  = 16'd57;
-  assign rom[9]  = 16'd29;
-  assign rom[10] = 16'd14;
-  assign rom[11] = 16'd7;
 
+  reg [3:0] step;
+  // values of arctan of powers of 2 from 0 to -11, hardwired:
   reg [15:0] rom_val;
   always @(*) begin
-    case (ui_in[3:0])
-      4'd0:  rom_val = rom[0];
-      4'd1:  rom_val = rom[1];
-      4'd2:  rom_val = rom[2];
-      4'd3:  rom_val = rom[3];
-      4'd4:  rom_val = rom[4];
-      4'd5:  rom_val = rom[5];
-      4'd6:  rom_val = rom[6];
-      4'd7:  rom_val = rom[7];
-      4'd8:  rom_val = rom[8];
-      4'd9:  rom_val = rom[9];
-      4'd10: rom_val = rom[10];
-      4'd11: rom_val = rom[11];
+    case (step[3:0])
+      4'd0:  rom_val = 16'd11520;
+      4'd1:  rom_val = 16'd6801 ;
+      4'd2:  rom_val = 16'd3593 ;
+      4'd3:  rom_val = 16'd1824 ;
+      4'd4:  rom_val = 16'd916  ;
+      4'd5:  rom_val = 16'd458  ;
+      4'd6:  rom_val = 16'd229  ;
+      4'd7:  rom_val = 16'd115  ;
+      4'd8:  rom_val = 16'd57   ;
+      4'd9:  rom_val = 16'd29   ;
+      4'd10: rom_val = 16'd14   ;
+      4'd11: rom_val = 16'd7    ;
       default: rom_val = 16'd0;
     endcase
   end
 
-  assign uo_out  = rom_val[7:0];
-  assign uio_out = rom_val[15:8];
-  assign uio_oe  = 8'hFF; // Set uio to output so uio_out is used
+  reg [15:0] xval;
+  reg [15:0] yval;
+  reg [15:0] zval;
+  wire [15:0] xout;
+  wire [15:0] yout;
+  wire [15:0] zout;
+  reg state;
+
+  cordic_keyaan main(
+    .x (xval),
+    .y (yval),
+    .z (zval),
+
+    .xnew (xout),
+    .ynew (yout),
+    .znew (zout),
+
+    .i (step),
+    .constant (rom_val)
+  );
+
+  always @(posedge clk, negedge rst_n) begin
+    if(!rst_n) begin
+      step <= 4'd0;
+      xval <= 16'b0010011011011100; // 0.6072 in Q2.14
+      yval <= 16'd0;
+      zval <= 16'd0;
+      state <= 0;
+    end else begin
+      if(state) begin
+        if (step == 4'd11) begin
+          step <= 4'd0;
+          state <= 1'd0;
+        end else begin
+          step <= step + 1'b1;
+        end
+        xval <= xout;
+        yval <= yout;
+        zval <= zout;  
+      end
+      else begin
+        zval[15:8] <= ui_in;
+        if(uio_in[2]) begin
+          state <= 1;
+        end
+      end
+    end
+  end
+
+  // just for compiling atm
+  assign uio_oe = 8'b00000000;
+  assign uo_out = state ? zval[15:8]: xval[15:8];
+  assign uio_out = 8'd8;
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, ui_in[7:4], uio_in, clk, rst_n, 1'b0};
+  wire _unused = &{ena, uio_in[7:3], uio_in[1:0],  1'b0};
 
 endmodule
