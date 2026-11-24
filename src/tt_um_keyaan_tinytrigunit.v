@@ -154,7 +154,7 @@ module tt_um_keyaan_tinytrigunit (
 
   
 
-assign uio_out[5] = {5'b0, state, 2'b0};
+assign uio_out = {5'b0, state, 2'b0};
 
   // List all unused inputs to prevent warnings
   wire _unused = &{ena, uio_in[7:5], uio_out[7:6], uio_out[4:1],   1'b0};
