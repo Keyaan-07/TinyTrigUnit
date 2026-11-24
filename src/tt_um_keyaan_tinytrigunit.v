@@ -17,6 +17,47 @@ module tt_um_keyaan_tinytrigunit (
 );
 
   reg [3:0] step;
+  reg state;
+  
+  reg [15:0] xval;
+  reg [15:0] yval;
+  reg [15:0] zval;
+  wire [15:0] xout;
+  wire [15:0] yout;
+  wire [15:0] zout;
+
+  wire load = uio_in[4];
+  wire in_sel = uio_in[3];
+  wire [1:0] out_sel = uio_in[1:0];
+
+  always @(posedge load) begin
+    if(in_sel) begin
+      zval[15:8] <= ui_in;
+    end else begin
+      zval[7:0] <= ui_in;
+    end
+  end
+
+
+  // setting BUSY to output while everything else is an input
+  assign uio_oe = 8'b00100000;
+
+  reg [2:0] run_reg;
+  wire run = uio_in[2];
+
+  always @(posedge clk, negedge rst_n) begin
+    if(!rst_n) begin
+      run_reg[2:0] <= 3'b0;
+    end else begin
+      run_reg <= {run_reg[1:0], run};
+    end
+  end
+
+  wire run_posedge = ~run_reg[2] & run_reg[1];
+
+
+
+  
   // values of arctan of powers of 2 from 0 to -11, hardwired:
   reg [15:0] rom_val;
   always @(*) begin
@@ -37,13 +78,7 @@ module tt_um_keyaan_tinytrigunit (
     endcase
   end
 
-  reg [15:0] xval;
-  reg [15:0] yval;
-  reg [15:0] zval;
-  wire [15:0] xout;
-  wire [15:0] yout;
-  wire [15:0] zout;
-  reg state;
+
 
   cordic_keyaan main(
     .x (xval),
@@ -58,38 +93,56 @@ module tt_um_keyaan_tinytrigunit (
     .constant (rom_val)
   );
 
+
+
   always @(posedge clk, negedge rst_n) begin
+    
     if(!rst_n) begin
       step <= 4'd0;
-      xval <= 16'b0010011011011100; // 0.6072 in Q2.14
+      xval <= 16'd9949; // 0.6072 in Q2.14
       yval <= 16'd0;
       zval <= 16'd0;
-      state <= 0;
+      state <= 1'b0;
     end else begin
+
+
       if(state) begin
         if (step == 4'd11) begin
           step <= 4'd0;
           state <= 1'd0;
+
         end else begin
           step <= step + 1'b1;
+
         end
+
         xval <= xout;
         yval <= yout;
         zval <= zout;  
-      end
-      else begin
-        zval[15:8] <= ui_in;
-        if(uio_in[2]) begin
+        uio_out = xval[7:0];
+
+      end else begin
+
+        if(run_posedge) begin
           state <= 1;
+          step <= 4'd0;
+          xval <= 16'd9949; // 0.6072 in Q2.14
+          yval <= 16'd0;
+          zval <= 16'd0;
         end
+
       end
     end
   end
 
-  // just for compiling atm
-  assign uio_oe = 8'b00000000;
-  assign uo_out = state ? zval[15:8]: xval[15:8];
-  assign uio_out = 8'd8;
+
+  case (out_sel[1:0])
+          2'b01:   assign uo_out = xval[15:8];
+          2'b00:   assign uo_out = xval[7:0];
+          2'b11:   assign uo_out = yval[15:8];
+          2'b10:   assign uo_out = yval[7:0];
+          default: assign uo_out = xval[7:0];
+        endcase
 
   // List all unused inputs to prevent warnings
   wire _unused = &{ena, uio_in[7:3], uio_in[1:0],  1'b0};

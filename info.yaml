@@ -44,11 +44,11 @@ pinout:
   uo[7]: "OUT7"
 
   # Bidirectional pins
-  uio[0]: "RESET"
+  uio[0]: "OUT_SEL"
   uio[1]: "OUT_SEL"
-  uio[2]: "LOAD"
+  uio[2]: "RUN"
   uio[3]: "IN_SEL"
-  uio[4]: "READ"
+  uio[4]: "LOAD"
   uio[5]: "BUSY"
   uio[6]: ""
   uio[7]: ""
