@@ -28,14 +28,16 @@ async def test_project(dut):
     # loading low-byte of z:  
     dut.ui_in.value = 0
     dut.uio_in.value = 0b0001_0000
-    await ClockCycles(dut.clk, 1)
+    await ClockCycles(dut.clk, 5)
     dut.uio_in.value = 0b0000_1000
-    await ClockCycles(dut.clk, 1)
+    await ClockCycles(dut.clk, 5)
 
     # Loading high-byte of z:  
     dut.ui_in.value = 0b0001_1110
     dut.uio_in.value = 0b0001_1000
-    await ClockCycles(dut.clk, 1)
+    await ClockCycles(dut.clk, 5)
+    dut.uio_in.value = 0b0000_0100
+    await ClockCycles(dut.clk, 5)
     dut.uio_in.value = 0b0000_0000
     await ClockCycles(dut.clk, 100)
     
