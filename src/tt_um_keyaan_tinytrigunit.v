@@ -26,17 +26,21 @@ module tt_um_keyaan_tinytrigunit (
   wire [15:0] yout;
   wire [15:0] zout;
 
-  wire load = uio_in[4];
   wire in_sel = uio_in[3];
   wire [1:0] out_sel = uio_in[1:0];
 
-  always @(posedge load) begin
-    if(in_sel) begin
-      zval[15:8] <= ui_in;
+  wire load = uio_in[4];
+  reg [2:0] load_reg;
+  
+  always @(posedge clk, negedge rst_n) begin
+    if(!rst_n) begin
+      load_reg[2:0] <= 3'b0;
     end else begin
-      zval[7:0] <= ui_in;
+      load_reg <= {load_reg[1:0], load};
     end
   end
+
+  wire load_posedge = ~load_reg[2] & load_reg[1];
 
 
   // setting BUSY to output while everything else is an input
@@ -56,7 +60,7 @@ module tt_um_keyaan_tinytrigunit (
   wire run_posedge = ~run_reg[2] & run_reg[1];
 
 
-
+  reg [7:0] outreg;
   
   // values of arctan of powers of 2 from 0 to -11, hardwired:
   reg [15:0] rom_val;
@@ -76,8 +80,15 @@ module tt_um_keyaan_tinytrigunit (
       4'd11: rom_val = 16'd7    ;
       default: rom_val = 16'd0;
     endcase
+    case (out_sel[1:0])
+      2'b01:   outreg = xval[15:8];
+      2'b00:   outreg = xval[7:0];
+      2'b11:   outreg = yval[15:8];
+      2'b10:   outreg = yval[7:0];
+      default: outreg = xval[7:0];
+    endcase
   end
-
+  assign uo_out = outreg;
 
 
   cordic_keyaan main(
@@ -118,8 +129,7 @@ module tt_um_keyaan_tinytrigunit (
 
         xval <= xout;
         yval <= yout;
-        zval <= zout;  
-        uio_out = xval[7:0];
+        zval <= zout;     
 
       end else begin
 
@@ -128,23 +138,25 @@ module tt_um_keyaan_tinytrigunit (
           step <= 4'd0;
           xval <= 16'd9949; // 0.6072 in Q2.14
           yval <= 16'd0;
-          zval <= 16'd0;
+        end
+
+        if(load_posedge) begin
+          if(in_sel) begin
+            zval[15:8] <= ui_in;
+          end else begin
+              zval[7:0] <= ui_in;
+          end
         end
 
       end
     end
   end
 
+  
 
-  case (out_sel[1:0])
-          2'b01:   assign uo_out = xval[15:8];
-          2'b00:   assign uo_out = xval[7:0];
-          2'b11:   assign uo_out = yval[15:8];
-          2'b10:   assign uo_out = yval[7:0];
-          default: assign uo_out = xval[7:0];
-        endcase
+assign uio_out[5] = {5'b0, state, 2'b0};
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, uio_in[7:3], uio_in[1:0],  1'b0};
+  wire _unused = &{ena, uio_in[7:5], uio_out[7:6], uio_out[4:1],   1'b0};
 
 endmodule
